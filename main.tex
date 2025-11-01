@@ -1,0 +1,567 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage[swedish]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{appendix}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{subcaption}
+
+\title{Undersökning av egenskaper hos $G(n, p$)-slumpgrafer}
+
+\author{Suheyla Bamukhtar, Gustav Jörgensen, Leo Lennartsson}
+\date{datum September 2025}
+
+\begin{document}
+
+\maketitle
+
+
+\begin{abstract}
+Denna rapport undersöker egenskaper, såsom tröskelvärden och fördelningar, hos slumpgrafer enligt $G(n, p$)-modellen. Detta genomfördes med teoretisk analys och även simuleringar i Python där syftet var att besvara 5 frågor: uppkomsten av jättekomponenter, storleken på $p$ för att sannolikheten att slumpgrafen alltid ska vara sammanhängande då $n\rightarrow\infty$, fördelningen av trianglar respektive isolerade noder då $p=1/n$ och den största klickstorleken då $p=1/2$. Resultatet på fråga 1 tyder på bla bla bla. För fråga 2 blev storleken för $p_n = \frac{\log n}{n}$. För fråga 3.... För fråga 4 blev antalet isolerade noder poisson-fördelat med parameter $\lambda=n/e$. För fråga 5 blev resultatet att den största klicktstorleken i  $G(n, 1/2$) växer $2 \log_2(n)$. 
+\end{abstract}
+
+\newpage
+\section{Inledning}
+
+En graf $G=(V,E)$, där V är en mängd noder och E en mängd kanter mellan noderna. Slumpgrafen $G_n$ enligt $G(n, p)$-modellen, där varje möjlig kant mellan noder uppstår med sannolikhet $p$, fungerar som ett verktyg för att analysera egenskaper hos sådana grafer. Ett centralt intresse inom grafteori är att förstå vid vilka värden för $p$ som vissa egenskaper uppstår. 
+
+Forskning om slumpgrafer har flera praktiska tillämpningar, bl. a. att modellera nätverk som internets webbgraf, människors sociala nätverk och neurala nätverk \cite{Tesliuc2017}.
+
+Vi utgår från teoretiska resultat inom sannolikhetsteori, samt genomför egna simuleringar i Python för att illustrera resultaten. Projektets syfte är att både hitta och visualisera tröskelvärden, sannolikhetsfördelningar och beteenden hos slumpgrafer genom att försöka besvara följande frågor:
+\begin{enumerate}
+    \item Hur stort behöver $p = p_n$ vara som funktion av $n$ för att sannolikheten att den största sammanhängande komponenten innehåller minst $0.25n$ noder går mot $1$ då $n \to \infty$?
+    \item Vilken storlek på $p=p_n$ krävs för att sannolikheten att slumpgrafen $G_n$ är sammanhängande går mot $1$ då $n \to \infty$?
+    \item Om $p = 1/n$, vad är den asymptotiska fördelningen för antalet trianglar? (En triangel är en trippel noder $u, v, w$ sådan att alla tre kanterna $uv, uw$ och $vw$ finns med i $G_n$.)
+    \item Vad är den asymptotiska fördelningen för antalet isolerade, alltså noder utan koppling till någon av grafens andra noder, då $p = 1/n$?
+    \item Hur stor blir den största klicken, d.v.s den mängd där varje par noder har en kant mellan sig, då $p = 1/2$?
+\end{enumerate}
+
+
+\section{Metod}
+
+För att besvara frågorna har vi använt oss av både teoretisk analys och simuleringar i Python.
+
+\subsection{Fråga 1}
+Vi ville undersöka vid vilka värden på $p=\tfrac{c}{n}$ som den största komponenten i $G(n,p)$ innehåller minst $0.25n$ noder \cite{jlr1999}.
+Som bakgrund kan nämnas att det finns ett välkänt fasövergångsbeteende i slumpgrafer: när $c \leq 1$ består grafen mest av små komponenter, men när $c > 1$ uppträder en jättekomponent som omfattar en positiv andel av noderna.
+
+För att generera slumpgraferna använde vi Batagelj--Brandes-algoritmen,
+som gör det möjligt att skapa $G(n,p)$ i tid $O(n+m)$, där $m$ är antalet
+kanter \cite{BatageljBrandes2005}. För varje graf beräknade vi den största komponentens storlek med BFS, och upprepade experimenten för flera värden på $c$ kring den kritiska punkten.
+
+\subsection{Fråga 2}
+För fråga 2 använder vi asymptotiska resultat från grafteori som säger att tröskelvärdet för sammanhängande graf i $G(n, p)$ är $p_n = \frac{\log n}{n}$ \cite{Tesliuc2017}. Vi simulerar slumpgrafer för $n=10,100,1000,2000$ och motsvarande $p=\frac{\log n}{n}$ för att undersöka när grafen blir sammanhängande.
+
+\subsection{Fråga 3}
+Vi undersökte hur antalet trianglar i $G(n,p)$ fördelar sig när $p=\tfrac{1}{n}$. 
+Teorin säger att i denna skala blir trianglar sällsynta och nästan oberoende, vilket leder till att antalet trianglar $T$ konvergerar mot en Poisson-fördelning med parameter $\lambda=\tfrac{1}{6}$.
+
+För att verifiera detta genomförde vi simuleringar i Python. Vi genererade slumpgrafer med $n=6000$ och $p=1/n$ med hjälp av Batagelj--Brandes-algoritmen. För varje graf räknade vi antalet trianglar med en effektiv metod baserad på grad-orientering. Vi upprepade försöken många gånger för att få en tillförlitlig fördelning.
+
+
+\subsection{Fråga 4}
+Vi undersökte hur antalet isolerade noder i $G(n,p)$ fördelas när $p=\tfrac{1}{n}$. Genom beräkningar fick vi att det teoretiska väntevärdet för antalet isolerade noder är $n/e$ då $n \to \infty$ och förväntas konvergera mot en Poisson-fördelning \cite{jlr1999}. För att verifiera detta genomfördes simuleringar i Python.
+
+Med hjälp av en etablerad funktion (från Python-biblioteket NetworkX) som genererar slumpgrafer enligt $G(n, p)$-modellen, genererades $G(n,1/n)$ där n=1000 och 500 simuleringar genomfördes. Antalet isolerade noder i varje graf sparades och plottades i ett histogram. 
+
+\subsection{Fråga 5}
+För fråga 5 har vi beräknat storleken på den största klicken vid fast sannolikhet $p = 1/2$, där det är känt att den största klicken i $G(n, 1/2)$ är ungefär $2 \log_2(n)$ \cite{bollobas2001}. Vi har verifierat detta genom simuleringar där vi genererade $G(n, 1/2)$-grafer med varierande n (många simuleringar av samma n genomfördes), hittade de maximala klickar i varje graf och slutligen gjordes en regressionslinje där det genomsnittliga största klickstorleken för olika n plottades.
+
+
+\section{Resultat}
+
+\subsection{Fråga 1}
+Simuleringarna visar tydligt fasövergången: för $c$ strax över 1 börjar den största komponenten snabbt växa. 
+Vid värden kring $c \approx 1.15$ observerade vi att den största komponenten i genomsnitt omfattar ungefär $25\%$ av alla noder. 
+För större $c$ fortsätter andelen att växa. Resultaten från simuleringarna överensstämmer väl med de teoretiska förväntningarna.
+
+\begin{center}
+\includegraphics[width=0.75\linewidth]{output.png}
+\end{center}
+
+\subsection{Fråga 2}
+I fråga 2 simulerade vi slumpgrafer enligt $G(n,p)$-modellen för olika värden på 
+$n$, där $p$ sattes till det teoretiska tröskelvärdet 
+$p_n=\frac{\log{n}}{n}$. För varje värde på $n$ genererades ett antal grafer, och vi mätte andelen som var sammanhängande.
+
+I Figur~\ref{sammanhängandegrafer} ser vi att sannolikheten går mot 1 då $n \rightarrow \infty$. Redan vid $n=100$ kan vi observera den skarpa övergången där sannolikheten går mot 1 för detta p. Vi ser att tröskelvärdet närmar sig 0 då $n$ växer ($\frac{\log n}{n}\rightarrow0, n\rightarrow\infty$) alltså går sannolikheten mot 1 då $n\rightarrow\infty$.
+
+\begin{figure}
+    
+    \begin{subfigure}{0.475\linewidth}
+    \includegraphics[width=\linewidth]{sammanhängandegraf10.png}
+    \caption{$n=10$}
+    \end{subfigure}
+\hfill
+    \begin{subfigure}{0.475\linewidth}
+    \includegraphics[width=\linewidth]{sammanhängandegraf100.png}
+    \caption{$n=100$}
+    \end{subfigure}
+    
+\medskip
+
+    \begin{subfigure}{0.475\linewidth}
+    \includegraphics[width=\linewidth]{sammanhängandegraf1000.png}
+    \caption{$n=1000$}
+    \end{subfigure}
+\hfill
+    \begin{subfigure}{0.475\linewidth}
+    \includegraphics[width=\linewidth]{sammanhängandegraf2000.png}
+    \caption{$n=2000$}
+    \end{subfigure}
+
+    \caption{Sannolikheten att $G(n,p)$ är sammanhängande för olika $n$.}
+    \label{sammanhängandegrafer}
+\end{figure}
+
+\subsection{Fråga 3}
+Resultaten från simuleringarna visar att antalet trianglar oftast är 0 eller 1, och mer sällan 2 eller fler. Histogrammet från våra försök stämmer väl överens med sannolikhetsmassfunktionen för en Poissonfördelning med $\lambda=\tfrac{1}{6}$.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\linewidth]{output3.png}
+    \caption{}
+    \label{}
+\end{figure}
+Det empiriska medelvärdet och variansen för antalet trianglar låg mycket nära $\tfrac{1}{6}$, vilket stärker slutsatsen att fördelningen är Poissonliknande.
+
+\subsection{Fråga 4} 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.5\linewidth]{F4.png}
+    \caption{Fördelningen av antalet isolerade noder i $G(n, 1/n)$ då n=1000.}
+    \label{figf4}
+\end{figure}
+Histogrammet i figur~\ref{figf4} visar den empiriska fördelningen av G(n, 1/n) för n=1000 över 500 simuleringar. Fördelningen centreras kring ett specifikt värde, ungefär 370, och är någorlunda klockformad samt asymmetrisk. 
+
+
+\subsection{Fråga 5}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.5\linewidth]{image.png}
+    \caption{Tillväxten av den största klickstorleken i $G(n, 1/2)$.}
+    \label{figf5}
+\end{figure}
+Figur~\ref{figf5} visar hur de empiriska punkterna (genomsnittlig klickstorlek) följer en logaritmisk trendlinje där lutningen är $\approx 1.70$, vilket till viss del stödjer att den största klickstorleken i $G(n, 1/2)$ växer $2 \log_2(n)$.
+
+\section{Diskussion}
+
+\subsection{Fråga 1}
+
+Våra simuleringar bekräftar den teoretiska bilden av slumpgrafernas fasövergång: 
+för små $c$ saknas en jättekomponent, men när $c$ ökar förbi ett tröskelvärde uppträder en komponent som växer linjärt med $n$. 
+Vi kan konstatera att runt $c \approx 1.15$ blir denna komponent ungefär en fjärdedel av hela grafen. 
+Små avvikelser mellan simulering och teori kan förklaras av ändliga storlekseffekter, men trenden är tydlig även för måttligt stora $n$.
+
+\subsection{Fråga 2}
+
+Resultaten för fråga 2 stämmer väl överens med tidigare teoretiska förutsägelser om slumpgrafer. Det observerade tröskelvärdet vid $p_n=\frac{\log{n}}{n}$
+visar den tydliga övergången från icke-sammanhängande till sammanhängande grafer. Denna övergång går mot noll då $n\rightarrow\infty$ och sannolikheten att slumpgrafen är sammanhängande går mot 1.
+
+\subsection{Fråga 3}
+Simuleringarna bekräftar den teoretiska förutsägelsen att antalet trianglar i $G(n,1/n)$ konvergerar mot en Poissonfördelning med parameter $\lambda=\tfrac{1}{6}$. Detta illustrerar ett generellt fenomen i slumpgrafer: när sannolikheten väljs i en kritisk skala (här $1/n$) blir små strukturer som trianglar sällsynta men följer en enkel slumpmodell.
+
+Små avvikelser i frekvensen av 2 eller fler trianglar kan tillskrivas ändliga storlekseffekter och slumpvariation i simuleringarna. För större $n$ skulle dessa skillnader minska ytterligare. Våra resultat visar att redan vid $n=6000$ syns Poissonbeteendet tydligt.
+
+\subsection{Fråga 4}
+Det teoretiska väntevärdet för antalet isolerade noder i en $G(1000,1/1000)$, $1000/e \approx 367.88$, överensstämmer väl med det mest frekventa antalet isolerade noder i histogrammet. Resultatet stödjer den teoretiska förutsägelsen att den  asymptotiska fördelningen för antalet isolerade noder är en Poisson-fördelning med parameter $\lambda=n/e$.
+
+Tillförlitligheten av resultat för vad den asymptotiska fördelningen för antalet isolerade noder blir, hade kunnat öka genom att testa simuleringar för ökande n, t.ex n=500, n=1000 och n=2000. 
+
+\subsection{Fråga 5}
+Simuleringarna för att bestämma den största klicken utnyttjade NetworkX-funktionen find\_cliques som var effektiv men vi stötte ändå på problem eftersom att hitta maximal klickstorlek är ett NP-svårt problem. Ursprungsidén var n=1000 men detta var ej hanterbart för datorn; genom att helt enkelt testa fick vi fram att 200 var det största, hanterbara värdet för n. 
+
+Mer tillförlitliga resultat skulle kunna erhållas om man testar för större n-värden och förstås flera simuleringar.  
+
+\bibliographystyle{plain} 
+\bibliography{referenser}
+
+\newpage
+\appendix
+\section{Appendix}
+
+Fråga 1 \& 3
+\begin{verbatim}
+# Löser uppgift 1 och 3 med Python.
+# - Uppgift 1: när blir största komponenten ≥ 0.25 n (p_n = c/n). Jämför simulering med teori.
+# - Uppgift 3: antal trianglar när p = 1/n. Jämför mot Poisson(1/6).
+
+import math
+import numpy as np
+import pandas as pd
+from collections import deque
+import matplotlib.pyplot as plt
+from pathlib import Path
+from typing import List, Tuple, Set
+
+# --------------------------
+# Hjälpfunktioner
+# --------------------------
+def fast_gnp_undirected(n: int, p: float, rng: np.random.Generator) -> List[Tuple[int, int]]:
+    """
+    Skapar kanter i G(n,p) med Batagelj–Brandes (förväntad O(m)).
+    Returnerar lista av (u,v) med u < v.
+    """
+    if p <= 0.0 or n <= 1:
+        return []
+    if p >= 1.0:
+        return [(u, v) for u in range(n) for v in range(u + 1, n)]
+
+    lp = math.log(1.0 - p)
+    v = 1
+    w = 0
+    edges = []
+    # Hoppa över icke-kanter geometriskt och lägg till nästa kant
+    while v < n:
+        r = rng.random()
+        skip = 0 if r == 0.0 else int(math.floor(math.log(1.0 - r) / lp))
+        w = w + skip + 1
+        while w >= v and v < n:
+            w = w - v
+            v = v + 1
+        if v < n:
+            edges.append((w, v))
+    return edges
+
+def edges_to_adj(n: int, edges: List[Tuple[int, int]]) -> List[Set[int]]:
+    """Bygger grannskapslista från kantlista."""
+    adj = [set() for _ in range(n)]
+    for u, v in edges:
+        adj[u].add(v)
+        adj[v].add(u)
+    return adj
+
+def largest_component_size(adj: List[Set[int]]) -> int:
+    """Storleken på största komponenten (BFS)."""
+    n = len(adj)
+    seen = [False] * n
+    best = 0
+    for s in range(n):
+        if not seen[s]:
+            q = deque([s])
+            seen[s] = True
+            size = 0
+            while q:
+                u = q.popleft()
+                size += 1
+                for v in adj[u]:
+                    if not seen[v]:
+                        seen[v] = True
+                        q.append(v)
+            if size > best:
+                best = size
+    return best
+
+def fixed_point_beta(c: float, tol: float = 1e-12, max_iter: int = 10_000) -> float:
+    """
+    Löser β = 1 - exp(-cβ) (storleken på jättekomponenten som andel).
+    Ger 0 för c ≤ 1, annars lösningen i (0,1).
+    """
+    if c <= 1.0:
+        return 0.0
+    b = 0.5
+    for _ in range(max_iter):
+        nb = 1.0 - math.exp(-c * b)
+        if abs(nb - b) < tol:
+            return nb
+        b = nb
+    return b
+
+# --------- Snabb triangelräkning (grad-orientering) ----------
+def count_triangles_degree_oriented(adj: List[Set[int]]) -> int:
+    """
+    Räknar trianglar exakt:
+    - Orientera kant u->v om deg(u)<deg(v) eller (deg lika och u<v).
+    - T = sum_u sum_{v i F(u)} |F(u) ∩ F(v)|.
+    """
+    n = len(adj)
+    deg = [len(adj[u]) for u in range(n)]
+    F = [set() for _ in range(n)]
+    for u in range(n):
+        du = deg[u]
+        for v in adj[u]:
+            dv = deg[v]
+            if (du < dv) or (du == dv and u < v):
+                F[u].add(v)
+    tri = 0
+    for u in range(n):
+        Fu = F[u]
+        if not Fu:
+            continue
+        for v in Fu:
+            tri += len(Fu & F[v])
+    return tri
+
+# --------------------------
+# Uppgift 1: största komponenten ≥ 0.25 n
+# --------------------------
+rng = np.random.default_rng(12345)
+
+c_star = -math.log(0.75) / 0.25           # tröskel där β = 0.25
+c_grid = np.linspace(0.8, 1.4, 121)       # för teorikurva
+beta_theory = np.array([fixed_point_beta(float(c)) for c in c_grid])
+
+# Simuleringsparametrar (justera vid behov)
+n_p1 = 30000
+c_values = [1.05, 1.10, c_star, 1.16, 1.20, 1.30]
+replicates = 10
+
+sim_rows = []
+for c in c_values:
+    p = c / n_p1
+    for r in range(replicates):
+        edges = fast_gnp_undirected(n_p1, p, rng)
+        adj = edges_to_adj(n_p1, edges)
+        L = largest_component_size(adj)
+        sim_rows.append({
+            "c": c,
+            "p": p,
+            "replicate": r + 1,
+            "largest_component_frac": L / n_p1
+        })
+
+p1_df = pd.DataFrame(sim_rows)
+# Stabil kolumnsättning: platt DataFrame
+p1_summary = (
+    p1_df
+    .groupby("c", as_index=False)["largest_component_frac"]
+    .agg(mean="mean", std="std", min="min", max="max")
+)
+# Lägg till teori
+p1_summary["beta_theory"] = p1_summary["c"].apply(lambda c: fixed_point_beta(float(c)))
+
+# Figur: teori vs simulering
+plt.figure(figsize=(7, 4.5))
+plt.plot(c_grid, beta_theory, label="Teoretisk β(c)")
+plt.scatter(p1_summary["c"], p1_summary["mean"], label="Simulerad andel (medel)")
+plt.axhline(0.25, linestyle="--", label="Mål: 0.25")
+plt.axvline(c_star, linestyle="--", label=f"c* ≈ {c_star:.6f}")
+plt.xlabel("c i p_n = c / n")
+plt.ylabel("Andel i största komponenten")
+plt.title("Uppgift 1: jättekomponentens storlek")
+plt.legend()
+fig1_path = Path("uppgift1_giant_component.png")
+plt.tight_layout()
+plt.savefig(fig1_path)
+plt.close()
+
+# Spara data
+p1_raw_path = Path("uppgift1_simulation_raw.csv")
+p1_summary_path = Path("uppgift1_simulation_summary.csv")
+p1_df.to_csv(p1_raw_path, index=False)
+p1_summary.to_csv(p1_summary_path, index=False)
+
+# --------------------------
+# Uppgift 3: trianglar för p = 1/n
+# --------------------------
+rng = np.random.default_rng(54321)
+
+n_p3 = 6000
+p_p3 = 1.0 / n_p3
+trials = 600   # öka för jämnare kurva
+
+tri_counts = []
+for t in range(trials):
+    edges = fast_gnp_undirected(n_p3, p_p3, rng)
+    adj = edges_to_adj(n_p3, edges)
+    tri = count_triangles_degree_oriented(adj)
+    tri_counts.append(tri)
+
+p3_df = pd.DataFrame({"trial": np.arange(1, trials+1), "triangles": tri_counts})
+
+# Empirisk fördelning
+emp_counts = p3_df["triangles"].value_counts().sort_index()
+emp_probs = (emp_counts / trials)
+
+# Poisson(1/6) för jämförelse
+lam = 1.0 / 6.0
+k_max = max(5, int(emp_counts.index.max()))
+k_plot = np.arange(0, k_max + 1)
+pois_pmf = np.array([math.exp(-lam) * (lam**k) / math.factorial(k) for k in k_plot])
+
+# Figur: empiri vs Poisson
+plt.figure(figsize=(7, 4.5))
+heights = emp_probs.reindex(k_plot, fill_value=0).to_numpy()
+plt.bar(k_plot, heights, alpha=0.6, label="Empirisk sannolikhet")
+plt.plot(k_plot, pois_pmf, marker="o", label="Poisson(1/6)")
+plt.xlabel("Antal trianglar T")
+plt.ylabel("Sannolikhet")
+plt.title("Uppgift 3: trianglar vid p = 1/n")
+plt.legend()
+fig3_path = Path("uppgift3_triangles_distribution.png")
+plt.tight_layout()
+plt.savefig(fig3_path)
+plt.close()
+
+# Spara data
+p3_raw_path = Path("uppgift3_triangle_counts.csv")
+p3_df.to_csv(p3_raw_path, index=False)
+
+# Utskrift av nyckelresultat
+emp_mean = p3_df["triangles"].mean()
+emp_var = p3_df["triangles"].var(ddof=0)
+
+print("\nUppgift 1 – Nyckelresultat")
+print(f"c* (β=0.25) = {c_star:.12f}")
+print(p1_summary.to_string(index=False))
+
+print("\nUppgift 3 – Nyckelresultat")
+print(f"Antal försök: {trials}, n = {n_p3}, p = 1/n = {p_p3:.6g}")
+print(f"Empiriskt medel(T): {emp_mean:.6f} (teori 1/6 ≈ {lam:.6f})")
+print(f"Empirisk varians(T): {emp_var:.6f} (teori 1/6 ≈ {lam:.6f})")
+
+print("\nFiler skapade:")
+print(f"- Figur (Uppgift 1): {fig1_path}")
+print(f"- Data (Uppgift 1, rå): {p1_raw_path}")
+print(f"- Data (Uppgift 1, sammanfattning): {p1_summary_path}")
+print(f"- Figur (Uppgift 3): {fig3_path}")
+print(f"- Data (Uppgift 3, rå): {p3_raw_path}")
+
+\end{verbatim}
+
+Fråga 2
+\begin{verbatim}
+import numpy as np
+import matplotlib.pyplot as plt
+from collections import deque
+
+# generera grannmatris för G(n, p)
+def generate_random_graph(n, p):
+    adj_matrix = np.random.rand(n, n) < p
+    adj_matrix = np.triu(adj_matrix, 1)
+    adj_matrix += adj_matrix.T  # symmetrisk matris
+    return adj_matrix.astype(int)
+
+# kolla sammanhängande
+def is_connected(adj_matrix):
+    n = adj_matrix.shape[0]
+    visited = np.zeros(n, dtype=bool)
+    queue = deque([0])
+    visited[0] = True
+
+    while queue:
+        node = queue.popleft()
+        neighbors = np.where(adj_matrix[node] == 1)[0]
+        for neighbor in neighbors:
+            if not visited[neighbor]:
+                visited[neighbor] = True
+                queue.append(neighbor)
+    
+    return visited.all()
+
+# estimera sannolikheten för sammanhängande graf
+def is_connected_prob(n, ps, trials=100):
+    probs = []
+    for p in ps:
+        count = 0
+        for _ in range(trials):
+            adj_matrix = generate_random_graph(n, p)
+            if is_connected(adj_matrix):
+                count += 1
+        probs.append(count / trials)
+    return probs
+
+# parametrar (n = 10,100,1000,2000)
+n = 100
+log_n_over_n = np.log(n) / n
+ps = np.linspace(0.5 * log_n_over_n, 2 * log_n_over_n, 20)
+
+# simulering
+probs = is_connected_prob(n, ps)
+
+# plot av resultat
+plt.plot(ps, probs, marker='o')
+plt.axvline(log_n_over_n, color='r', linestyle='--', label='log(n)/n')
+plt.xlabel("p")
+plt.ylabel("Sannolikhet för sammanhängande graf")
+plt.title(f"Sannolikhet att G(n, p) är sammanhängande (n={n})")
+plt.legend()
+plt.grid(True)
+plt.show()
+\end{verbatim}
+
+
+\textbf{Fråga 4}
+\begin{verbatim}
+import networkx as nx
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+#fkn som genererar G(n, 1/n) och sparar antalet isolerade noder i varje simulering. 
+def simulate_isolated_nodes(n, num_simulations=500):
+    isolated_counts = []
+
+    for _ in range(num_simulations):
+        G = nx.erdos_renyi_graph(n, 1/n)
+        isolated = sum(1 for node in G.nodes if G.degree[node] == 0)
+        isolated_counts.append(isolated)
+
+    return isolated_counts
+
+# Plotta och rita histogrammet då n=1000
+n = 1000  
+isolated = simulate_isolated_nodes(n)
+
+sns.histplot(isolated, kde=True)
+plt.title(f"Fördelning av isolerade noder för n = {n}, p = 1/n")
+plt.xlabel("Antal isolerade noder")
+plt.ylabel("Frekvens")
+plt.show()
+
+\end{verbatim}
+
+Fråga 5
+\begin{verbatim}
+import networkx as nx
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def simulate_largest_clique(n, num_simulations=200):
+    from networkx.algorithms.clique import find_cliques
+    max_clique_sizes = []
+
+    for _ in range(num_simulations):
+        G = nx.erdos_renyi_graph(n, 0.5)
+        max_clique = max((len(c) for c in find_cliques(G)), default=0)
+        max_clique_sizes.append(max_clique)
+
+    return max_clique_sizes
+
+# Kör simuleringar
+n = 200  # n=1000, n=500 krascha/tog för lång tid
+clique_sizes = simulate_largest_clique(n)
+
+#försöka identifiera ett mönster i storleken av klick baserat på n.
+def average_max_clique (n_values, num_simulations=200):
+    averages = []
+
+    for n in n_values:
+        clique_sizes = simulate_largest_clique(n, num_simulations)
+        avg = np.mean(clique_sizes)
+        averages.append(avg)
+
+    return averages
+
+n_values = np.arange(20, 201, 10)  # n= 20, 30, ..., 200
+avg_clique_sizes = average_max_clique (n_values)
+
+# Logaritmisk regression: log2(n)
+from scipy.stats import linregress
+
+log_n = np.log2(n_values)
+slope, intercept, r_value, _, _ = linregress(log_n, avg_clique_sizes)
+
+# Plotta resultat
+plt.plot(n_values, avg_clique_sizes, 'o', label="Empirisk")
+plt.plot(n_values, slope * log_n + intercept, 'r--', label=f"Approx ≈ {slope:.2f} * log_2(n) + {intercept:.2f}")
+plt.xlabel("antal noder")
+plt.ylabel("Genomsnittlig största klickens storlek")
+plt.title("Tillväxt av största klicken för olika n (p = 1/2)")
+plt.legend()
+plt.grid(True)
+plt.show()
+\end{verbatim}
+
+\end{document}
